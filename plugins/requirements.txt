@@ -1,0 +1,7 @@
+polars
+psycopg2
+fastexcel
+python-dotenv
+psycopg2
+sqlalchemy
+tqdm
