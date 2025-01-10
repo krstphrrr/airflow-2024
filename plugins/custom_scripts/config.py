@@ -18,7 +18,7 @@ DATABASE_CONFIG = {
 }
 
 TODAYS_DATE = date.today().isoformat()
-DATA_DIR = "./data" #change to tall?
+DATA_DIR = "./data" 
 
 LOGGING_CONFIG = {
     'version': 1,
