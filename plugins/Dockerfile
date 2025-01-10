@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
 # Switch back to the airflow user
 USER airflow
 
+EXPOSE 8080
+
 # Copy and install Python dependencies
 COPY requirements.txt /
 RUN pip install --no-cache-dir "apache-airflow==${AIRFLOW_VERSION}" -r /requirements.txt
