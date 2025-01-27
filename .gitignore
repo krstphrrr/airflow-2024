@@ -116,3 +116,4 @@ logs/
 
 # actual data
 **/*.csv
+**/aws
