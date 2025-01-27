@@ -298,4 +298,4 @@ volumes:
 
 secrets:
   aws_credentials:
-    external: true
+    file: ./aws
