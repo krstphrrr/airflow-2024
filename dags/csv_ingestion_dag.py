@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.sensors.filesystem import FileSensor
+from airflow.providers.amazon.aws.operators.s3 import S3ListOperator
 from airflow.utils.dates import days_ago
 import os
 from custom_scripts.data_loader import process_csv
@@ -37,11 +38,29 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    check_for_files = FileSensor(
-        task_id='check_for_new_files',
-        filepath=DATA_DIR,
-        poke_interval=30,
-        timeout=600,
+    # check_for_files = FileSensor(
+    #     task_id='check_for_new_files',
+    #     filepath=DATA_DIR,
+    #     poke_interval=30,
+    #     timeout=600,
+    # )
+    list_files_in_s3 = S3ListOperator(
+        task_id='list_files_in_s3',
+        bucket='ldc-pg-resources',
+        aws_conn_id='aws_default',
+        # prefix='data/',
+        # delimiter='/',
+    )
+
+    # test task 
+    def process_file_list(file_list):
+        for file_name in file_list:
+            print(f"processing file: {file_name}")
+
+    remote_process_files = PythonOperator(
+        task_id='remote_process_files',
+        python_callable=process_file_list,
+        op_kwargs={'file_list': "{{ task_instance.xcom_pull(task_ids='list_files_in_s3') }}"},
     )
 
     process_csv_files = PythonOperator(
@@ -56,4 +75,5 @@ with DAG(
         op_kwargs={'file_name': 'dataHeader.csv'},
     )
 
-    check_for_files >> process_csv_files >> insert_to_db
+    list_files_in_s3 >> remote_process_files
+    # >> process_csv_files >> insert_to_db
